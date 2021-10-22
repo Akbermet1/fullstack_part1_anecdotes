@@ -1,5 +1,15 @@
 import React, { useState } from 'react'
 
+const Anecdote = ({title, anecdote, voteCount}) => {
+  return (
+   <div>
+      <h1> {title}  </h1>
+      <p> {anecdote} </p>
+      <p> has {voteCount} {voteCount >= 0 ? " votes" : " vote"} </p>
+   </div> 
+  )
+}
+
 const Button = ({text, onClick}) => {
   return (
     <button onClick={onClick}>
@@ -35,14 +45,32 @@ const App = () => {
     setAnectdoteVotes(newAnectdoteVotes)
   }
 
+  const findMostUpvotedAnecdote = () => {
+    let mostUpvotedIndex = 0
+    for(let i = 0; i < anectdoteVotes; i++)
+    {      
+      if(anectdoteVotes[mostUpvotedIndex] < anectdoteVotes[i])
+      {
+        mostUpvotedIndex = i
+      }
+    }
+
+    console.log(mostUpvotedIndex)
+    return mostUpvotedIndex
+  }
+
   return (
     <div>
-      <div>
+      {/* <div>
         <p> {anecdotes[selected]} </p>
         <p> has {anectdoteVotes[selected]} votes </p>
-      </div>
+      </div> */}
+      <Anecdote title={"Anecdote of the day"} anecdote={anecdotes[selected]} voteCount={anectdoteVotes[selected]}/>
       <Button text={"vote"} onClick={() => voteForAnecdote(selected)}/>
       <Button text={"next anecdote"} onClick={selectRandomAnecdote}/>
+      <Anecdote title={"Anecdote with most votes"} anecdote={anecdotes[findMostUpvotedAnecdote()]} voteCount={anectdoteVotes[findMostUpvotedAnecdote()]}/>
+      {/* <Anecdote title={"Anecdote with most votes"} anecdote={() => findMostUpvotedAnecdote()} voteCount={anectdoteVotes[findMostUpvotedAnecdote()]}/> */}
+      {/* create a separate component to display the most upvoted joke */}
     </div>
   )
 }
