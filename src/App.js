@@ -10,6 +10,36 @@ const Anecdote = ({title, anecdote, voteCount}) => {
   )
 }
 
+const AnecdoteWithMostVotes = ({title, anecdotes, anecdotesState}) => {
+  const findMostUpvotedIndex = () => {
+    let mostUpvotedIndex = 0
+    for(let i = 0; i < anecdotesState.votes.length; i++)
+    {      
+      if(anecdotesState.votes[mostUpvotedIndex] < anecdotesState.votes[i])
+      {
+        mostUpvotedIndex = i
+      }
+    }
+
+    console.log(mostUpvotedIndex)
+    return mostUpvotedIndex
+  }
+
+  let anecdote_index = findMostUpvotedIndex()
+
+  if(Math.max(...anecdotesState.votes) > 0)
+    return (
+      <Anecdote title={title} anecdote={anecdotes[anecdote_index]} voteCount={anecdotesState.votes[anecdote_index]}/>
+    )
+  else
+  return (
+    <div>
+      <h1> {title}  </h1>
+      <p> There is no most upvoted anecdote yet. </p>
+    </div>
+  )
+}
+
 const Button = ({text, onClick}) => {
   return (
     <button onClick={onClick}>
@@ -29,48 +59,37 @@ const App = () => {
     'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients'
   ]
    
-  const [selected, setSelected] = useState(0)
-  const [anectdoteVotes, setAnectdoteVotes] = useState((new Array(anecdotes.length).fill(0)))
+  const [anecdotesState, setAnecdotesState] = useState({selected: 0, votes: new Array(anecdotes.length).fill(0)})
 
   const selectRandomAnecdote = () => {
-    const randomIndex = Math.round(Math.random() * (anecdotes.length - 1))
-    setSelected(randomIndex)
-    // console.log(randomIndex)
+    let randomIndex = Math.round(Math.random() * (anecdotes.length - 1))
+    const newState = {
+      selected: randomIndex,
+      votes: [...anecdotesState.votes]
+    }
+    console.log("index =",randomIndex)
+    console.log(newState)
+    setAnecdotesState(newState)
   }
 
   const voteForAnecdote = (anecdoteIndex) => {
-    const newAnectdoteVotes = [...anectdoteVotes]
-    newAnectdoteVotes[anecdoteIndex] += 1
-    console.log(newAnectdoteVotes)
-    setAnectdoteVotes(newAnectdoteVotes)
-  }
-
-  const findMostUpvotedAnecdote = () => {
-    let mostUpvotedIndex = 0
-    for(let i = 0; i < anectdoteVotes; i++)
-    {      
-      if(anectdoteVotes[mostUpvotedIndex] < anectdoteVotes[i])
-      {
-        mostUpvotedIndex = i
-      }
+    const newVotes = [...anecdotesState.votes]
+    newVotes[anecdoteIndex] += 1
+    const newState = {
+      ...anecdotesState,
+      votes: newVotes
     }
 
-    console.log(mostUpvotedIndex)
-    return mostUpvotedIndex
+    console.log(newState.votes)
+    setAnecdotesState(newState)
   }
 
   return (
     <div>
-      {/* <div>
-        <p> {anecdotes[selected]} </p>
-        <p> has {anectdoteVotes[selected]} votes </p>
-      </div> */}
-      <Anecdote title={"Anecdote of the day"} anecdote={anecdotes[selected]} voteCount={anectdoteVotes[selected]}/>
-      <Button text={"vote"} onClick={() => voteForAnecdote(selected)}/>
+      <Anecdote title={"Anecdote of the day"} anecdote={anecdotes[anecdotesState.selected]} voteCount={anecdotesState.votes[anecdotesState.selected]}/>
+      <Button text={"vote"} onClick={() => voteForAnecdote(anecdotesState.selected)}/>
       <Button text={"next anecdote"} onClick={selectRandomAnecdote}/>
-      <Anecdote title={"Anecdote with most votes"} anecdote={anecdotes[findMostUpvotedAnecdote()]} voteCount={anectdoteVotes[findMostUpvotedAnecdote()]}/>
-      {/* <Anecdote title={"Anecdote with most votes"} anecdote={() => findMostUpvotedAnecdote()} voteCount={anectdoteVotes[findMostUpvotedAnecdote()]}/> */}
-      {/* create a separate component to display the most upvoted joke */}
+      <AnecdoteWithMostVotes title={"Anecdote with most votes"} anecdotes={anecdotes} anecdotesState={anecdotesState}/>
     </div>
   )
 }
